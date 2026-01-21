@@ -28,12 +28,12 @@ Copy the ralph files into your project:
 mkdir -p scripts/ralph
 cp /path/to/ralph/ralph.sh scripts/ralph/
 
-# Copy the prompt template for your AI tool of choice:
-cp /path/to/ralph/prompt.md scripts/ralph/prompt.md    # For Amp
+# Copy the prompt template for your AI tool of choice (rename on copy):
+cp -R /path/to/ralph/prompts/AGENTS.md.amp.example scripts/ralph/AGENTS.md    # For Amp
 # OR
-cp /path/to/ralph/CLAUDE.md scripts/ralph/CLAUDE.md    # For Claude Code
+cp -R /path/to/ralph/prompts/CLAUDE.md.example scripts/ralph/CLAUDE.md        # For Claude Code
 # OR
-cp /path/to/ralph/CODEX.md scripts/ralph/CODEX.md      # For Codex
+cp -R /path/to/ralph/prompts/AGENTS.md.example scripts/ralph/AGENTS.md        # For Codex
 
 chmod +x scripts/ralph/ralph.sh
 ```
@@ -43,12 +43,14 @@ chmod +x scripts/ralph/ralph.sh
 Copy the skills to your Amp or Claude config for use across all projects:
 
 For AMP
+
 ```bash
 cp -r skills/prd ~/.config/amp/skills/
 cp -r skills/ralph ~/.config/amp/skills/
 ```
 
 For Claude Code
+
 ```bash
 cp -r skills/prd ~/.claude/skills/
 cp -r skills/ralph ~/.claude/skills/
@@ -104,6 +106,7 @@ This creates `prd.json` with user stories structured for autonomous execution.
 Default is 10 iterations. Use `--tool amp`, `--tool claude`, or `--tool codex` to select your AI coding tool.
 
 Ralph will:
+
 1. Create a feature branch (from PRD `branchName`)
 2. Pick the highest priority story where `passes: false`
 3. Implement that single story
@@ -115,18 +118,18 @@ Ralph will:
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `ralph.sh` | The bash loop that spawns fresh AI instances (supports `--tool amp`, `--tool claude`, or `--tool codex`) |
-| `prompt.md` | Prompt template for Amp |
-| `CLAUDE.md` | Prompt template for Claude Code |
-| `CODEX.md` | Prompt template for Codex |
-| `prd.json` | User stories with `passes` status (the task list) |
-| `prd.json.example` | Example PRD format for reference |
-| `progress.txt` | Append-only learnings for future iterations |
-| `skills/prd/` | Skill for generating PRDs |
-| `skills/ralph/` | Skill for converting PRDs to JSON |
-| `flowchart/` | Interactive visualization of how Ralph works |
+| File                            | Purpose                                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `ralph.sh`                      | The bash loop that spawns fresh AI instances (supports `--tool amp`, `--tool claude`, or `--tool codex`) |
+| `prompts/AGENTS.md.amp.example` | Prompt template for Amp                                                                                  |
+| `prompts/CLAUDE.md.example`     | Prompt template for Claude Code                                                                          |
+| `prompts/AGENTS.md.example`     | Prompt template for Codex                                                                                |
+| `prd.json`                      | User stories with `passes` status (the task list)                                                        |
+| `prd.json.example`              | Example PRD format for reference                                                                         |
+| `progress.txt`                  | Append-only learnings for future iterations                                                              |
+| `skills/prd/`                   | Skill for generating PRDs                                                                                |
+| `skills/ralph/`                 | Skill for converting PRDs to JSON                                                                        |
+| `flowchart/`                    | Interactive visualization of how Ralph works                                                             |
 
 ## Flowchart
 
@@ -147,6 +150,7 @@ npm run dev
 ### Each Iteration = Fresh Context
 
 Each iteration spawns a **new AI instance** (Amp, Claude Code, or Codex) with clean context. The only memory between iterations is:
+
 - Git history (commits from previous iterations)
 - `progress.txt` (learnings and context)
 - `prd.json` (which stories are done)
@@ -156,12 +160,14 @@ Each iteration spawns a **new AI instance** (Amp, Claude Code, or Codex) with cl
 Each PRD item should be small enough to complete in one context window. If a task is too big, the LLM runs out of context before finishing and produces poor code.
 
 Right-sized stories:
+
 - Add a database column and migration
 - Add a UI component to an existing page
 - Update a server action with new logic
 - Add a filter dropdown to a list
 
 Too big (split these):
+
 - "Build the entire dashboard"
 - "Add authentication"
 - "Refactor the API"
@@ -171,6 +177,7 @@ Too big (split these):
 After each iteration, Ralph updates the relevant `AGENTS.md` files with learnings. This is key because AI coding tools automatically read these files, so future iterations (and future human developers) benefit from discovered patterns, gotchas, and conventions.
 
 Examples of what to add to AGENTS.md:
+
 - Patterns discovered ("this codebase uses X for Y")
 - Gotchas ("do not forget to update Z when changing W")
 - Useful context ("the settings panel is in component X")
@@ -178,6 +185,7 @@ Examples of what to add to AGENTS.md:
 ### Feedback Loops
 
 Ralph only works if there are feedback loops:
+
 - Typecheck catches type errors
 - Tests verify behavior
 - CI must stay green (broken code compounds across iterations)
@@ -207,7 +215,8 @@ git log --oneline -10
 
 ## Customizing the Prompt
 
-After copying `prompt.md` (for Amp) or `CLAUDE.md` (for Claude Code) to your project, customize it for your project:
+After copying `AGENTS.md` (for Amp and Codex) or `CLAUDE.md` (for Claude Code) to your project, customize it for your project:
+
 - Add project-specific quality check commands
 - Include codebase conventions
 - Add common gotchas for your stack
